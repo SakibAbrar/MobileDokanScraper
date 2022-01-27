@@ -1,0 +1,4 @@
+venv/
+.vscode/
+chromedriver
+.idea/
