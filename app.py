@@ -1,9 +1,14 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import time
+import json
 
-import csv
 
-driver = webdriver.Chrome('./chromedriver')
+options = Options()
+options.add_argument('--headless')
+options.add_argument('--disable-gpu')
+
+driver = webdriver.Chrome('./chromedriver', chrome_options=options)
 
 BRAND_LINKS = [
     'https://www.mobiledokan.com/samsung/',
@@ -51,7 +56,7 @@ BRAND_LINKS = [
 CSV_COLUMNS_HEADERS = []
 
 
-def scroll_down_the_page(driver, duration=10):
+def scroll_down_the_page(driver, duration=5):
     """
     Sometimes the URLs don't properly load unless they are visited. So we try
     to visit them and make the browser load them.
@@ -152,19 +157,17 @@ print('##########Total {} products found##########\n\n\n'.format(
 # Fetching all product details from product links
 
 raw_data = []
-for idx, link in all_products_links:
-    print('Fetching {}/{} product details'.format(idx, len(all_products_links)))
+count = 0
+for link in all_products_links:
+    count += 1
+    print('Fetching {}/{} product details'.format(count, len(all_products_links)))
     data = get_product_details(driver, link)
     raw_data.append(data)
 
-# Writing raw data to csv
+# Writing raw data to json file
 
-keys = raw_data[0].keys()
-
-with open('result.csv', 'w', newline='') as output_file:
-    dict_writer = csv.DictWriter(output_file, keys)
-    dict_writer.writeheader()
-    dict_writer.writerows(raw_data)
+with open('raw_data.json', 'w') as fout:
+    json.dump(raw_data, fout)
 
 
 driver.close()
